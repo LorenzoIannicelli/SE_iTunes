@@ -7,7 +7,7 @@ class Album:
     duration : str
 
     def __str__(self):
-        return f'{self.title} ({self.duration} min)'
+        return f'- {self.title} ({self.duration:.2f} min)'
 
     def __hash__(self):
         return hash(self.id)

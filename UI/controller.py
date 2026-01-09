@@ -57,4 +57,16 @@ class Controller:
 
     def handle_get_set_album(self, e):
         """ Handler per gestire il problema ricorsivo di ricerca del set di album """""
-        # TODO
+        try :
+            tot_duration = int(self._view.txt_durata_totale.value)
+            album_set, duration = self._model.get_set_album(self.selected_album, tot_duration)
+
+            self._view.lista_visualizzazione_3.controls.clear()
+            txt1 = f'Set trovato ({len(album_set)} album, durata {duration:.2f} minuti):'
+            self._view.lista_visualizzazione_3.controls.append(ft.Text(txt1))
+            for a in album_set:
+                self._view.lista_visualizzazione_3.controls.append(ft.Text(a))
+            self._view.update()
+
+        except ValueError :
+            self._view.show_alert('Inserire un valore valido per la durata totale (int).')

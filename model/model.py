@@ -1,3 +1,5 @@
+import copy
+
 import networkx as nx
 from database.dao import DAO
 
@@ -8,6 +10,11 @@ class Model:
         self._dict_albums = {}
         self._map_albums_playlists = {}
         self._G = None
+
+        self._comp = None
+
+        self._best_set_album = None
+        self._duration = None
 
 
     def get_albums(self):
@@ -33,5 +40,29 @@ class Model:
 
     def get_connected_comp(self, a_id):
         a = self._dict_albums[a_id]
-        comp =  nx.node_connected_component(self._G, a)
-        return comp
+        self._comp =  nx.node_connected_component(self._G, a)
+        return self._comp
+
+    def get_set_album(self, id_album, tot_d):
+        comp = list(self._comp)
+        album = self._dict_albums[id_album]
+        self._best_set_album = []
+
+        self._ricorsione([album], comp, tot_d, album.duration)
+        return self._best_set_album, self._duration
+
+    def _ricorsione(self, parziale, albums, tot_d, current_duration):
+        if len(parziale) > len(self._best_set_album):
+            self._best_set_album = copy.deepcopy(parziale)
+            self._duration = current_duration
+
+        for i, a in enumerate(albums):
+            if a in parziale:
+                continue
+
+            new_duration = current_duration + a.duration
+            if new_duration < tot_d:
+                parziale.append(a)
+                self._ricorsione(parziale, albums, tot_d, new_duration)
+
+                parziale.pop()
